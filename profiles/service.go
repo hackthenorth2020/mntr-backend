@@ -39,14 +39,14 @@ func (srv *profileService) UpdateProfile(profile *Profile) (*Profile, error) {
 	return result, nil
 }
 
-func (srv *profileService) DeleteProfile(uid string) (bool, error) {
-	log.Printf("[PROFILE SRV] [DELETE PROFILE] %v", uid)
-	result, err := srv.repo.deleteProfile(uid)
-	if err != nil {
-		return false, err
-	}
-	return result, nil
-}
+// func (srv *profileService) DeleteProfile(uid string) (bool, error) {
+// 	log.Printf("[PROFILE SRV] [DELETE PROFILE] %v", uid)
+// 	result, err := srv.repo.deleteProfile(uid)
+// 	if err != nil {
+// 		return false, err
+// 	}
+// 	return result, nil
+// }
 
 func (srv *profileService) ReadAllProfiles() ([]*Profile, error) {
 	log.Printf("[PROFILE SRV] [READ ALL PROFILES]")
@@ -86,7 +86,7 @@ func (srv *profileService) FindMentor(UID string) ([]*Profile, error) {
 }
 
 func (srv *profileService) RequestMentor(req *MentorRequest) (bool, error) {
-	log.Printf("[PROFILE SRV] [DELETE JOB] %v", req)
+	log.Printf("[PROFILE SRV] [REQ MENTOR] %v", req)
 	//check if already requests?
 	result, err := srv.repo.requestMentor(req)
 	if err != nil {
@@ -122,14 +122,14 @@ func (srv *profileService) HandleMentorRequest(req *MentorResponse) (bool, error
 	return result, nil
 }
 
-func (srv *profileService) DeleteMentee(req *MentorRequest) (bool, error) {
-	log.Printf("[PROFILE SRV] [DELETE MENTEE] %v", req)
-	result, err := srv.repo.deleteMentee(req)
-	if err != nil {
-		return false, err
-	}
-	return result, nil
-}
+// func (srv *profileService) DeleteMentee(req *MentorRequest) (bool, error) {
+// 	log.Printf("[PROFILE SRV] [DELETE MENTEE] %v", req)
+// 	result, err := srv.repo.deleteMentor(req)
+// 	if err != nil {
+// 		return false, err
+// 	}
+// 	return result, nil
+// }
 
 func (srv *profileService) GetMessages(req *GetMessageRequest) ([]*Message, error) {
 	log.Printf("[PROFILE SRV] [GET MESSAGES] %v", req)

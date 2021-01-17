@@ -30,7 +30,7 @@ var (
 )
 
 const (
-	sqlConnString = "postgresql://alpha:alphakilo0001@free-tier.gcp-us-central1.cockroachlabs.cloud:26257/corny-baboon-155.cock-test?sslmode=verify-full&sslrootcert=secrets/hackthenorth-cockroachdb.crt"
+	sqlConnString = "postgresql://alpha:alphakilo0001@free-tier.gcp-us-central1.cockroachlabs.cloud:26257/corny-baboon-155.dev?sslmode=verify-full&sslrootcert=secrets/hackthenorth-cockroachdb.crt"
 )
 
 func main() {
@@ -54,20 +54,21 @@ func main() {
 			client, err := app.Auth(ctx)
 			if err != nil {
 				log.Printf("error getting Auth client: %v\n", err)
-				c.AbortWithError(401, err)
+				c.JSON(401, err)
 				return
 			}
 
 			token, err := client.VerifyIDToken(ctx, idToken)
 			if err != nil {
 				log.Printf("error verifying ID token: %v\n", err)
-				c.AbortWithError(401, err)
+				c.JSON(401, err)
 				return
 			}
 
 			// log.Printf("Verified ID token: %v\n", token)
 			c.Set("token", token)
 			c.Set("UID", token.UID)
+			// log.Printf("UID %v", token.UID)
 		}
 	}
 

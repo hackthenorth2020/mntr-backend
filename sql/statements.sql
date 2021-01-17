@@ -57,9 +57,9 @@ DELETE FROM jobs WHERE uid = $1, company = $2, position = $3;
 ----all mentor/mentee connections
 SELECT * FROM pairings WHERE mentor_id = $1 OR mentee_id = $2;
 ----select mentors
-SELECT * FROM pairings WHERE mentee_id = $1; --your UID
+SELECT * FROM pairings WHERE mentee_id = $1 AND status <> 0; --your UID
 ----select mentees
-SELECT * FROM pairings WHERE mentor_id = $1; --your UID
+SELECT * FROM pairings WHERE mentor_id = $1 AND status <> 0; --your UID
 ----create pairing
 INSERT INTO pairings VALUES ($1, $2, 1);
 ----update pairing
@@ -69,6 +69,10 @@ UPDATE pairings SET status = 0 WHERE mentor_id = $1 AND mentee_id = $2
 ----delete pairing
 DELETE FROM pairings WHERE mentor_id = $1 AND mentee_id = $2;
 
+SELECT * FROM (SELECT mentee_id FROM pairings WHERE mentor_id = $1 AND status = 1) JOIN profiles on mentor_id=uid;
+
+SELECT uid, fname, lname, email, bday, interests, bio FROM (SELECT mentee_id FROM pairings WHERE mentor_id = 'PqgwiFZpXbYeNTwSUPa2eTWLqp52' AND status = 1) JOIN profiles on mentee_id=uid;
+-- SELECT uid, fname, lname, email, bday, interests, bio FROM (SELECT mentee_id FROM pairings WHERE mentor_id = 'PqgwiFZpXbYeNTwSUPa2eTWLqp52' AND status = 1) JOIN profiles on mentor_id=uid;
 --POINTS
 ----update points
 UPDATE points SET points = points + $2 WHERE id = $1
@@ -83,15 +87,15 @@ GROUP BY uid)
 SELECT * FROM c WHERE common = (select max(common) from c);
 
 --TOP SIMILAIR INTERESTS $1 = UID, $2 = LIMIT
-with c as (SELECT uid, count(1) as common
-      FROM (SELECT uid, unnest(pplArr.languages) as lang
-      FROM pplArr)
-x WHERE lang = any(SELECT unnest(languages) FROM pplArr WHERE uid = $1) AND uid <> $1
+with cte as (SELECT uid, count(1) as common
+      FROM (SELECT uid, unnest(profiles.interests) as intr
+      FROM profiles)
+x WHERE intr = any(SELECT unnest(interests) FROM profiles WHERE uid = 'abc123') AND uid <> 'abc123'
 GROUP BY uid) 
-SELECT * FROM c ORDER BY common
+SELECT cte.uid, fname, lname, email, bday, interests, bio, common FROM cte INNER JOIN profiles p on cte.uid = p.uid ORDER BY common DESC;
 
 --MESSAGES $1 = you, $2 = target
-SELECT * FROM messages WHERE to = $2 AND from = $1
+SELECT * FROM messages WHERE (to = $2 AND from = $1) OR (to = $1 AND from = $2)
 
 INSERT INTO MESSAGES (from, to, message, time) VALUES ($1, $2, $3, $4)
 

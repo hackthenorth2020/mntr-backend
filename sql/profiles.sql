@@ -81,7 +81,7 @@ CREATE TABLE messages (
     msg_from text,
     msg_to text,
     message text,
-    time text
+    time text,
     CONSTRAINT fk_from_uid FOREIGN KEY (msg_from) REFERENCES profiles(uid),
-    CONSTRAINT fk_from_uid FOREIGN KEY (msg_to) REFERENCES profiles(uid)
-)
+    CONSTRAINT fk_to_uid FOREIGN KEY (msg_to) REFERENCES profiles(uid)
+);

@@ -1,18 +1,18 @@
 package profiles
 
 type Profile struct {
-	UID          string    `json:"id"`
-	FirstName    string    `json:"first_name"`
-	LastName     string    `json:"last_name"`
-	Email        string    `json:"email"`
-	Birthdate    string    `json:"birthdate"`
-	Interests    []string  `json:"interests"`
-	Bio          string    `json:"bio"`
-	Availability [7]string `json:"availability"`
-	Points       int       `json:"points"`
-	Edu          []*Education
-	Jobs         []*Job
-	SocialMedia  *Links
+	UID       string   `json:"id"`
+	FirstName string   `json:"first_name"`
+	LastName  string   `json:"last_name"`
+	Email     string   `json:"email"`
+	Birthdate string   `json:"birthdate"`
+	Interests []string `json:"interests"`
+	Bio       string   `json:"bio"`
+	// Availability [7]string `json:"availability"`
+	Points int `json:"points"`
+	// Edu          []*Education
+	// Jobs         []*Job
+	// SocialMedia  *Links
 	// Role        []string `json:"roles"`
 }
 
@@ -63,13 +63,13 @@ type DeleteJobRequest struct {
 }
 
 type MentorRequest struct {
-	MenteeUID string `json:"mentor_uid"`
-	MentorUID string `json:"mentee_uid"`
+	MenteeUID string `json:"mentee_uid"`
+	MentorUID string `json:"mentor_uid"`
 }
 
 type MentorResponse struct {
-	MentorUID string `json:"mentee_uid"`
-	MenteeUID string `json:"mentor_uid"`
+	MentorUID string `json:"mentor_uid"`
+	MenteeUID string `json:"mentee_uid"`
 	Response  int    `json:"response"`
 }
 

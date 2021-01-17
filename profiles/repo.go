@@ -43,68 +43,79 @@ func (repo *profileRepo) createProfile(profile *Profile) (*Profile, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, err = repo.conn.Exec(context.Background(), CREATE_LINKS, &profile.UID, &profile.SocialMedia.LinkedIn, &profile.SocialMedia.Twitter, &profile.SocialMedia.Facebook, &profile.SocialMedia.Github, &profile.SocialMedia.Other)
-	if err != nil {
-		return nil, err
-	}
-	_, err = repo.conn.Exec(context.Background(), CREATE_SCHEDULES, &profile.UID, &profile.Availability[0], &profile.Availability[1], &profile.Availability[2], &profile.Availability[3], &profile.Availability[4], &profile.Availability[5], &profile.Availability[6])
-	if err != nil {
-		return nil, err
-	}
 
-	for _, education := range profile.Edu {
-		_, err = repo.conn.Exec(context.Background(), CREATE_EDUCATION, &education.School, &education.StartDate, &education.EndDate, &education.Major, &education.City, &education.Country)
-		if err != nil {
-			return nil, err
-		}
-	}
-	for _, jobs := range profile.Jobs {
-		_, err = repo.conn.Exec(context.Background(), CREATE_JOBS, &profile.UID, &jobs.Company, &jobs.StartDate, &jobs.EndDate, &jobs.Position, &jobs.City, &jobs.Country)
-		if err != nil {
-			return nil, err
-		}
-	}
+	// _, err = repo.conn.Exec(context.Background(), CREATE_LINKS, &profile.UID, &profile.SocialMedia.LinkedIn, &profile.SocialMedia.Twitter, &profile.SocialMedia.Facebook, &profile.SocialMedia.Github, &profile.SocialMedia.Other)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// _, err = repo.conn.Exec(context.Background(), CREATE_SCHEDULES, &profile.UID, &profile.Availability[0], &profile.Availability[1], &profile.Availability[2], &profile.Availability[3], &profile.Availability[4], &profile.Availability[5], &profile.Availability[6])
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// for _, education := range profile.Edu {
+	// 	_, err = repo.conn.Exec(context.Background(), CREATE_EDUCATION, &education.School, &education.StartDate, &education.EndDate, &education.Major, &education.City, &education.Country)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
+	// for _, jobs := range profile.Jobs {
+	// 	_, err = repo.conn.Exec(context.Background(), CREATE_JOBS, &profile.UID, &jobs.Company, &jobs.StartDate, &jobs.EndDate, &jobs.Position, &jobs.City, &jobs.Country)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 	return profile, nil
 }
 
 //Read profile
 func (repo *profileRepo) readProfile(uid string) (*Profile, error) {
+	// var edu []*Education
+	// var job []*Job
+
+	// profile := &Profile{Edu: edu, Jobs: job, SocialMedia: &Links{}}
 	profile := &Profile{}
 	err := repo.conn.QueryRow(context.Background(), SELECT_PROFILE, uid).Scan(&profile.UID, &profile.FirstName, &profile.LastName, &profile.Email, &profile.Birthdate, &profile.Interests, &profile.Bio)
 	if err != nil {
 		return nil, err
 	}
-	rows, err := repo.conn.Query(context.Background(), SELECT_EDUCATION, uid)
-	if err != nil {
-		return nil, err
-	}
+	// rows, err := repo.conn.Query(context.Background(), SELECT_EDUCATION, uid)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	for rows.Next() {
-		education := &Education{}
-		err = rows.Scan(&education.School, &education.StartDate, &education.EndDate, &education.Major, &education.City, &education.Country)
-		if err != nil {
-			return nil, err
-		}
-		profile.Edu = append(profile.Edu, education)
-	}
+	// for rows.Next() {
+	// 	education := &Education{}
+	// 	err = rows.Scan(&education.School, &education.StartDate, &education.EndDate, &education.Major, &education.City, &education.Country)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	profile.Edu = append(profile.Edu, education)
+	// }
 
-	for rows.Next() {
-		jobs := &Job{}
-		err = rows.Scan(&profile.UID, &jobs.Company, &jobs.StartDate, &jobs.EndDate, &jobs.Position, &jobs.City, &jobs.Country)
-		if err != nil {
-			return nil, err
-		}
-		profile.Jobs = append(profile.Jobs, jobs)
-	}
+	// rows, err = repo.conn.Query(context.Background(), SELECT_JOBS, uid)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	err = repo.conn.QueryRow(context.Background(), SELECT_LINKS, uid).Scan(&profile.UID, &profile.SocialMedia.LinkedIn, &profile.SocialMedia.Twitter, &profile.SocialMedia.Facebook, &profile.SocialMedia.Github, &profile.SocialMedia.Other)
-	if err != nil {
-		return nil, err
-	}
-	err = repo.conn.QueryRow(context.Background(), SELECT_SCHEDULE, uid).Scan(&profile.UID, &profile.Availability[0], &profile.Availability[1], &profile.Availability[2], &profile.Availability[3], &profile.Availability[4], &profile.Availability[5], &profile.Availability[6])
-	if err != nil {
-		return nil, err
-	}
+	// for rows.Next() {
+	// 	jobs := &Job{}
+	// 	err = rows.Scan(&profile.UID, &jobs.Company, &jobs.StartDate, &jobs.EndDate, &jobs.Position, &jobs.City, &jobs.Country)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	profile.Jobs = append(profile.Jobs, jobs)
+	// }
+
+	// err = repo.conn.QueryRow(context.Background(), SELECT_LINKS, uid).Scan(&profile.UID, &profile.SocialMedia.LinkedIn, &profile.SocialMedia.Twitter, &profile.SocialMedia.Facebook, &profile.SocialMedia.Github, &profile.SocialMedia.Other)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// err = repo.conn.QueryRow(context.Background(), SELECT_SCHEDULE, uid).Scan(&profile.UID, &profile.Availability[0], &profile.Availability[1], &profile.Availability[2], &profile.Availability[3], &profile.Availability[4], &profile.Availability[5], &profile.Availability[6])
+	// if err != nil {
+	// 	return nil, err
+	// }
 	return profile, nil
 }
 
@@ -136,18 +147,18 @@ func (repo *profileRepo) updateProfile(profile *Profile) (*Profile, error) {
 	if profile.Bio == "" {
 		profile.Bio = oldProfile.Bio
 	}
-	if len(profile.Availability) <= 0 {
-		profile.Availability = oldProfile.Availability
-	}
+	// if len(profile.Availability) <= 0 {
+	// 	profile.Availability = oldProfile.Availability
+	// }
 	if profile.Points == 0 {
 		profile.Points = oldProfile.Points
 	}
-	if profile.Edu == nil {
-		profile.Edu = oldProfile.Edu
-	}
-	if profile.SocialMedia == nil {
-		profile.SocialMedia = oldProfile.SocialMedia
-	}
+	// if profile.Edu == nil {
+	// 	profile.Edu = oldProfile.Edu
+	// }
+	// if profile.SocialMedia == nil {
+	// 	profile.SocialMedia = oldProfile.SocialMedia
+	// }
 
 	// TODO EMILY!!!!
 	_, err = repo.conn.Exec(context.Background(), UPDATE_PROFILE, &profile.FirstName, &profile.LastName, &profile.Email, &profile.Birthdate, &profile.Interests, &profile.Bio)
@@ -206,7 +217,7 @@ func (repo *profileRepo) deleteEdu(req *DeleteEduRequest) (bool, error) {
 }
 
 func (repo *profileRepo) findMentor(UID string) ([]*Profile, error) {
-	rows, err := repo.conn.Query(context.Background(), GET_LIMIT_IMILAR_INTERESTS, UID, 5)
+	rows, err := repo.conn.Query(context.Background(), GET_LIMIT_SIMILAR_INTERESTS, UID, 5)
 	defer rows.Close()
 
 	profiles := make([]*Profile, 0)
@@ -217,6 +228,7 @@ func (repo *profileRepo) findMentor(UID string) ([]*Profile, error) {
 		if err != nil {
 			return nil, err
 		}
+		log.Printf("mentor found | %v", profile)
 		profiles = append(profiles, profile)
 	}
 
@@ -253,6 +265,7 @@ func (repo *profileRepo) viewMentorRequests(UID string) ([]*Profile, error) {
 		if err != nil {
 			return nil, err
 		}
+		log.Printf("[FOUND MENTEE REQ] %v", profile)
 		profiles = append(profiles, profile)
 	}
 

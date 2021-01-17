@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
 	"github.com/hackthenorth2020/mntr-backend/profiles"
 )
@@ -125,6 +127,7 @@ func findMentors(c *gin.Context) {
 	uid := c.GetString("UID")
 	resp, err := profileSrv.FindMentor(uid)
 	if err != nil {
+		log.Printf("[ERROR] [FIND MENTORS] %v", err)
 		c.JSON(501, err)
 		return
 	}
@@ -142,9 +145,11 @@ func requestMentor(c *gin.Context) {
 
 	if req.MenteeUID == "" {
 		req.MenteeUID = c.GetString("UID")
-	} else if req.MenteeUID != c.GetString("UID") {
-		c.JSON(402, "token UID does not match request UID")
 	}
+	// else if req.MenteeUID != c.GetString("UID") {
+	// 	c.JSON(402, "token UID does not match request UID")
+	// 	return
+	// }
 
 	resp, err := profileSrv.RequestMentor(req)
 	if err != nil {
@@ -192,6 +197,7 @@ func viewMentorRequests(c *gin.Context) {
 	uid := c.GetString("UID")
 	resp, err := profileSrv.ViewMentorRequests(uid)
 	if err != nil {
+		log.Printf("[ERROR] [VIEW MENTOR REQS] %v", err)
 		c.JSON(501, err)
 		return
 	}
@@ -210,7 +216,7 @@ func handleMentorRequest(c *gin.Context) {
 	if req.MentorUID == "" {
 		req.MentorUID = c.GetString("UID")
 	} else if req.MentorUID != c.GetString("UID") {
-		c.JSON(402, "token UID does not match request UID")
+		c.JSON(402, "token UID does not match request UID | "+req.MentorUID+" | "+c.GetString("UID"))
 	}
 
 	resp, err := profileSrv.HandleMentorRequest(req)
