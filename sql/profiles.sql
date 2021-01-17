@@ -4,7 +4,8 @@ create table profiles(
     lname text not null,
     email text not null,
     bday text not null,
-    interests text[]
+    interests text[],
+    bio text
 );
 
 create table education (
@@ -23,12 +24,12 @@ create table education (
 create table jobs (
     uid text,
     company text not null,
-    start_year text not null,
-    end_year text,
+    start_date text not null,
+    end_date text,
     position text not null,
     city text,
     country text,
-    PRIMARY KEY (uid, company, position, start_year),
+    PRIMARY KEY (uid, company, start_date),
     CONSTRAINT fk_uid FOREIGN KEY (uid) REFERENCES profiles(uid)
     ON DELETE CASCADE
 );
@@ -48,6 +49,7 @@ create table pairings (
     mentor_id text not null,
     mentee_id text not null,
     PRIMARY KEY (mentor_id, mentee_id),
+    CONSTRAINT not_self check (mentor_id <> mentee_id),
     CONSTRAINT fk_mentor FOREIGN KEY (mentor_id) REFERENCES profiles(uid),
     CONSTRAINT fk_mentee FOREIGN KEY (mentee_id) REFERENCES profiles(uid)
     ON DELETE CASCADE
@@ -62,6 +64,13 @@ create table schedules (
     friday text,
     saturday text,
     sunday text,
+    CONSTRAINT fk_uid FOREIGN KEY (uid) REFERENCES profiles(uid)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE points (
+    uid text primary key,
+    points int,
     CONSTRAINT fk_uid FOREIGN KEY (uid) REFERENCES profiles(uid)
     ON DELETE CASCADE
 );

@@ -37,31 +37,120 @@ func initDB(connStr string) *pgx.Conn {
 	return conn
 }
 
-//Create item
+//Create profile
 func (repo *profileRepo) createProfile(profile *Profile) (*Profile, error) {
-	_, err := repo.conn.Exec(context.Background(), "INSERT INTO users (uid, firstname, lastname) VALUES ($1, $2, $3)", &profile.UID, &profile.FirstName, &profile.LastName)
+	_, err := repo.conn.Exec(context.Background(), CREATE_PROFILE, &profile.UID, &profile.FirstName, &profile.LastName, &profile.Email, &profile.Birthdate, &profile.Interests, &profile.Bio)
+	if err != nil {
+		return nil, err
+	}
+	_, err = repo.conn.Exec(context.Background(), CREATE_LINKS, &profile.UID, &profile.SocialMedia.LinkedIn, &profile.SocialMedia.Twitter, &profile.SocialMedia.Facebook, &profile.SocialMedia.Github, &profile.SocialMedia.Other)
+	if err != nil {
+		return nil, err
+	}
+	_, err = repo.conn.Exec(context.Background(), CREATE_SCHEDULES, &profile.UID, &profile.Availability[0], &profile.Availability[1], &profile.Availability[2], &profile.Availability[3], &profile.Availability[4], &profile.Availability[5], &profile.Availability[6])
 	if err != nil {
 		return nil, err
 	}
 
+	for _, education := range profile.Edu {
+		_, err = repo.conn.Exec(context.Background(), CREATE_EDUCATION, &education.School, &education.StartDate, &education.EndDate, &education.Major, &education.City, &education.Country)
+		if err != nil {
+			return nil, err
+		}
+	}
+	for _, jobs := range profile.Jobs {
+		_, err = repo.conn.Exec(context.Background(), CREATE_JOBS, &profile.UID, &jobs.Company, &jobs.StartDate, &jobs.EndDate, &jobs.Position, &jobs.City, &jobs.Country)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return profile, nil
 }
 
-//Read item
+//Read profile
 func (repo *profileRepo) readProfile(uid string) (*Profile, error) {
 	profile := &Profile{}
-	row := repo.conn.QueryRow(context.Background(), "SELECT * FROM profiles WHERE uid = $1", uid)
-	err := row.Scan(&profile.UID, &profile.FirstName, &profile.LastName)
+	err := repo.conn.QueryRow(context.Background(), SELECT_PROFILE, uid).Scan(&profile.UID, &profile.FirstName, &profile.LastName, &profile.Email, &profile.Birthdate, &profile.Interests, &profile.Bio)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := repo.conn.Query(context.Background(), SELECT_EDUCATION, uid)
 	if err != nil {
 		return nil, err
 	}
 
+	for rows.Next() {
+		education := &Education{}
+		err = rows.Scan(&education.School, &education.StartDate, &education.EndDate, &education.Major, &education.City, &education.Country)
+		if err != nil {
+			return nil, err
+		}
+		profile.Edu = append(profile.Edu, education)
+	}
+
+	for rows.Next() {
+		jobs := &Job{}
+		err = rows.Scan(&profile.UID, &jobs.Company, &jobs.StartDate, &jobs.EndDate, &jobs.Position, &jobs.City, &jobs.Country)
+		if err != nil {
+			return nil, err
+		}
+		profile.Jobs = append(profile.Jobs, jobs)
+	}
+
+	err = repo.conn.QueryRow(context.Background(), SELECT_LINKS, uid).Scan(&profile.UID, &profile.SocialMedia.LinkedIn, &profile.SocialMedia.Twitter, &profile.SocialMedia.Facebook, &profile.SocialMedia.Github, &profile.SocialMedia.Other)
+	if err != nil {
+		return nil, err
+	}
+	err = repo.conn.QueryRow(context.Background(), SELECT_SCHEDULE, uid).Scan(&profile.UID, &profile.Availability[0], &profile.Availability[1], &profile.Availability[2], &profile.Availability[3], &profile.Availability[4], &profile.Availability[5], &profile.Availability[6])
+	if err != nil {
+		return nil, err
+	}
 	return profile, nil
 }
 
-//Update item
+//Update profile
 func (repo *profileRepo) updateProfile(profile *Profile) (*Profile, error) {
-	_, err := repo.conn.Exec(context.Background(), "UPDATE profiles SET firstname = $2, lastname = $3 role = $4 WHERE uid = $1", &profile.UID, &profile.FirstName, &profile.LastName)
+	oldProfile, err := repo.readProfile(profile.UID)
+	if err != nil {
+		return nil, err
+	}
+
+	if profile.UID == "" {
+		profile.UID = oldProfile.UID
+	}
+	if profile.FirstName == "" {
+		profile.FirstName = oldProfile.FirstName
+	}
+	if profile.LastName == "" {
+		profile.LastName = oldProfile.LastName
+	}
+	if profile.Email == "" {
+		profile.Email = oldProfile.Email
+	}
+	if profile.Birthdate == "" {
+		profile.Birthdate = oldProfile.Birthdate
+	}
+	if profile.Interests == nil {
+		profile.Interests = oldProfile.Interests
+	}
+	if profile.Bio == "" {
+		profile.Bio = oldProfile.Bio
+	}
+	if len(profile.Availability) <= 0 {
+		profile.Availability = oldProfile.Availability
+	}
+	if profile.Points == 0 {
+		profile.Points = oldProfile.Points
+	}
+	if profile.Edu == nil {
+		profile.Edu = oldProfile.Edu
+	}
+	if profile.SocialMedia == nil {
+		profile.SocialMedia = oldProfile.SocialMedia
+	}
+
+	// TODO EMILY!!!!
+	_, err = repo.conn.Exec(context.Background(), UPDATE_PROFILE, &profile.FirstName, &profile.LastName, &profile.Email, &profile.Birthdate, &profile.Interests, &profile.Bio)
 	if err != nil {
 		return nil, err
 	}
@@ -69,9 +158,9 @@ func (repo *profileRepo) updateProfile(profile *Profile) (*Profile, error) {
 	return profile, nil
 }
 
-//Delete item
+//Delete profile
 func (repo *profileRepo) deleteProfile(uid string) (bool, error) {
-	_, err := repo.conn.Exec(context.Background(), "DELETE FROM profiles WHERE uid = $1", &uid)
+	_, err := repo.conn.Exec(context.Background(), DELETE_EDUCATION + DELETE_JOBS, &profile.UID)
 	if err != nil {
 		return false, err
 	}
@@ -81,7 +170,7 @@ func (repo *profileRepo) deleteProfile(uid string) (bool, error) {
 
 //Read All profiles
 func (repo *profileRepo) readAllProfiles() ([]*Profile, error) {
-	rows, err := repo.conn.Query(context.Background(), "SELECT * FROM profiles")
+	rows, err := repo.conn.Query(context.Background(), SELECT_ALL_PROFILES)
 	defer rows.Close()
 
 	profiles := make([]*Profile, 0)
