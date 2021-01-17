@@ -78,10 +78,10 @@ CREATE TABLE points (
 
 CREATE TABLE messages (
     uuid UUID PRIMARY KEY,
-    from text,
-    to text,
+    msg_from text,
+    msg_to text,
     message text,
     time text
-    CONSTRAINT fk_from_uid FOREIGN KEY (from) REFERENCES profiles(uid),
-    CONSTRAINT fk_from_uid FOREIGN KEY (to) REFERENCES profiles(uid)
+    CONSTRAINT fk_from_uid FOREIGN KEY (msg_from) REFERENCES profiles(uid),
+    CONSTRAINT fk_from_uid FOREIGN KEY (msg_to) REFERENCES profiles(uid)
 )

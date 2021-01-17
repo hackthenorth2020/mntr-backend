@@ -10,7 +10,7 @@ import (
 	jwtMiddleware "github.com/auth0/go-jwt-middleware"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/hackthenorth2020/go-firebase/items"
+	"github.com/hackthenorth2020/mntr-backend/profiles"
 	"google.golang.org/api/option"
 )
 
@@ -25,8 +25,8 @@ Go-Firebase Template
 */
 
 var (
-	app     *firebase.App
-	itemSrv items.ItemService
+	app        *firebase.App
+	profileSrv profiles.ProfileService
 )
 
 const (
@@ -88,7 +88,7 @@ func main() {
 	r.POST("/profiles", authMiddleware(), createProfile)
 	r.GET("/profiles/:id", authMiddleware(), readProfile)
 	r.PUT("/profiles", authMiddleware(), updateProfile)
-	r.DELETE("/profiles/:id", authMiddleware(), deleteProfile)
+	// r.DELETE("/profiles/:id", authMiddleware(), deleteProfile)
 	r.GET("/profiles", authMiddleware(), readAllProfiles)
 
 	r.DELETE("/job", authMiddleware(), deleteJob)
@@ -97,13 +97,12 @@ func main() {
 	r.POST("/mentor", authMiddleware(), requestMentor)
 	r.DELETE("/mentor", authMiddleware(), deleteMentor)
 
-	r.GET("/mentee", authMiddleware(), viewWentorRequests)
+	r.GET("/mentee", authMiddleware(), viewMentorRequests)
 	r.POST("/mentee", authMiddleware(), handleMentorRequest)
-	r.DELETE("/mentee", authMiddlware(), deleteMentee)
+	// r.DELETE("/mentee", authMiddleware(), deleteMentee)
 
 	r.GET("/messages", authMiddleware(), getMessages)
 	r.POST("/message", authMiddleware(), sendMessage)
-
 
 	r.Run(":8081") // listen and serve on 0.0.0.0:8081 (for windows "localhost:8081")
 }

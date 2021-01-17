@@ -23,13 +23,29 @@ const (
 	DELETE_EDUCATION = "DELETE FROM education WHERE uid = $1 AND school = $2 AND major = $3;"
 	DELETE_JOBS      = "DELETE FROM jobs WHERE uid = $1 AND company = $2 AND position = $3;"
 
-	SELECT_PAIRING = "SELECT * FROM pairings WHERE mentor_id = $1 OR mentee_id = $2;"
-	INSERT_PAIRING = "INSERT INTO pairings VALUES ($1, $2);"
-	DELETE_PAIRING = "DELETE FROM pairings WHERE mentor_id = $1 AND mentee_id = $2;"
+	SELECT_PAIRING        = "SELECT * FROM pairings WHERE (mentor_id = $1 OR mentee_id = $2) AND status <> 0;"
+	SELECT_MENTORS        = "SELECT * FROM pairings WHERE mentee_id = $1 AND status <> 0;"
+	SELECT_MENTEES        = "SELECT * FROM pairings WHERE mentor_id = $1 AND status <> 0;"
+	SELECT_MENTOR_REQS    = "SELECT * FROM pairings WHERE mentor_id = $1 AND status = 1"
+	UPDATE_PAIR_MATCHED   = "UPDATE pairings SET status = 2 WHERE mentor_id = $1 AND mentee_id = $2"
+	UPDATE_PAIR_UNMATCHED = "UPDATE pairings SET status = 0 WHERE mentor_id = $1 AND mentee_id = $2"
+	INSERT_PAIRING        = "INSERT INTO pairings VALUES ($1, $2, 1);"
+	DELETE_PAIRING        = "DELETE FROM pairings WHERE mentor_id = $1 AND mentee_id = $2;"
 
-	UPDATE_POINTS = "UPDATE points SET points = $2 WHERE id = $1"
+	UPDATE_POINTS = "UPDATE points SET points = points + $2 WHERE id = $1"
 
 	GET_MOST_SIMILAR_INTERESTS = "with c as (SELECT uid, count(1) as common FROM (SELECT uid, unnest(profiles.interests) as intr FROM profiles) " +
 		"x WHERE intr = any(SELECT unnest(interests) FROM profiles WHERE uid = $1) AND uid <> $1	GROUP BY uid) " +
 		"SELECT * FROM c WHERE common = (select max(common) from c);"
+
+	GET_LIMIT_IMILAR_INTERESTS = "with cte as (SELECT uid, count(1) as common " +
+		"FROM (SELECT uid, unnest(profiles.interests) as intr " +
+		"FROM profiles) " +
+		"x WHERE intr = any(SELECT unnest(interests) FROM profiles WHERE uid = $1) AND uid <> '$1' " +
+		"GROUP BY uid)  " +
+		"SELECT cte.uid, fname, lname, email, bday, interests, bio, common FROM cte INNER JOIN profiles p on cte.uid = p.uid ORDER BY common DESC LIMIT $2;"
+
+	GET_MESSAGES = "SELECT * FROM messages WHERE (to = $2 AND from = $1) OR (to = $1 AND from = $2)"
+
+	INSERT_MESSAGE = "INSERT INTO MESSAGES (from, to, message, time) VALUES ($1, $2, $3, $4)"
 )

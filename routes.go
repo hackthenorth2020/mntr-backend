@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/hackthenorth2020/go-firebase/profiles"
+	"github.com/hackthenorth2020/mntr-backend/profiles"
 )
 
 func createProfile(c *gin.Context) {
@@ -13,10 +13,10 @@ func createProfile(c *gin.Context) {
 		return
 	}
 
-	if createProfileRequest.UID == nil {
+	if createProfileRequest.UID == "" {
 		createProfileRequest.UID = c.GetString("UID")
 	} else if createProfileRequest.UID != c.GetString("UID") {
-		c.JSON("402", gin.H{"error", "token UID does not match request UID"})
+		c.JSON(402, "token UID does not match request UID")
 	}
 
 	resp, err := profileSrv.CreateProfile(createProfileRequest)
@@ -29,14 +29,9 @@ func createProfile(c *gin.Context) {
 }
 
 func readProfile(c *gin.Context) {
-	idStr := c.Param("id")
-	id, err := Atoi(idStr)
-	if err != nil {
-		c.JSON(501, err)
-		return
-	}
+	uid := c.Param("id")
 
-	resp, err := profileSrv.ReadProfile(&id)
+	resp, err := profileSrv.ReadProfile(uid)
 	if err != nil {
 		c.JSON(501, err)
 		return
@@ -53,10 +48,10 @@ func updateProfile(c *gin.Context) {
 		return
 	}
 
-	if updateProfileRequest.UID == nil {
+	if updateProfileRequest.UID == "" {
 		updateProfileRequest.UID = c.GetString("UID")
 	} else if updateProfileRequest.UID != c.GetString("UID") {
-		c.JSON("402", gin.H{"error", "token UID does not match request UID"})
+		c.JSON(402, "token UID does not match request UID")
 	}
 
 	resp, err := profileSrv.UpdateProfile(updateProfileRequest)
@@ -82,11 +77,11 @@ func updateProfile(c *gin.Context) {
 
 func deleteJob(c *gin.Context) {
 
-	req := profiles.DeleteJobRequest{}
-	if req.UID == nil {
+	req := &profiles.DeleteJobRequest{}
+	if req.UID == "" {
 		req.UID = c.GetString("UID")
 	} else if req.UID != c.GetString("UID") {
-		c.JSON("402", gin.H{"error", "token UID does not match request UID"})
+		c.JSON(402, "token UID does not match request UID")
 	}
 
 	resp, err := profileSrv.DeleteJob(req)
@@ -100,11 +95,11 @@ func deleteJob(c *gin.Context) {
 
 func deleteEdu(c *gin.Context) {
 
-	req := profiles.DeleteEduRequest{}
-	if req.UID == nil {
+	req := &profiles.DeleteEduRequest{}
+	if req.UID == "" {
 		req.UID = c.GetString("UID")
 	} else if req.UID != c.GetString("UID") {
-		c.JSON("402", gin.H{"error", "token UID does not match request UID"})
+		c.JSON(402, "token UID does not match request UID")
 	}
 
 	resp, err := profileSrv.DeleteEdu(req)
@@ -145,6 +140,12 @@ func requestMentor(c *gin.Context) {
 		return
 	}
 
+	if req.MenteeUID == "" {
+		req.MenteeUID = c.GetString("UID")
+	} else if req.MenteeUID != c.GetString("UID") {
+		c.JSON(402, "token UID does not match request UID")
+	}
+
 	resp, err := profileSrv.RequestMentor(req)
 	if err != nil {
 		c.JSON(501, err)
@@ -162,6 +163,21 @@ func deleteMentor(c *gin.Context) {
 		return
 	}
 
+	if req.MentorUID == "" {
+		req.MentorUID = c.GetString("UID")
+	}
+	if req.MenteeUID == "" {
+		req.MenteeUID = c.GetString("UID")
+	}
+
+	if req.MentorUID == req.MenteeUID {
+		c.JSON(402, "why is mentorUID = menteeUID??? Maybe both are empty?")
+		return
+	} else if req.MentorUID != c.GetString("UID") && req.MenteeUID != c.GetString("UID") {
+		c.JSON(402, "token UID does not match request UID")
+		return
+	}
+
 	resp, err := profileSrv.DeleteMentor(req)
 	if err != nil {
 		c.JSON(501, err)
@@ -174,7 +190,7 @@ func deleteMentor(c *gin.Context) {
 
 func viewMentorRequests(c *gin.Context) {
 	uid := c.GetString("UID")
-	resp, err := profileSrv.FindMentor(uid)
+	resp, err := profileSrv.ViewMentorRequests(uid)
 	if err != nil {
 		c.JSON(501, err)
 		return
@@ -184,14 +200,20 @@ func viewMentorRequests(c *gin.Context) {
 }
 
 func handleMentorRequest(c *gin.Context) {
-	req := &profiles.MentorRequest{}
+	req := &profiles.MentorResponse{}
 
 	if err := c.Bind(&req); err != nil {
 		c.JSON(501, err)
 		return
 	}
 
-	resp, err := profileSrv.DeleteMentor(req)
+	if req.MentorUID == "" {
+		req.MentorUID = c.GetString("UID")
+	} else if req.MentorUID != c.GetString("UID") {
+		c.JSON(402, "token UID does not match request UID")
+	}
+
+	resp, err := profileSrv.HandleMentorRequest(req)
 	if err != nil {
 		c.JSON(501, err)
 		return
@@ -200,26 +222,36 @@ func handleMentorRequest(c *gin.Context) {
 	c.JSON(200, &resp)
 }
 
-func deleteMentee(c *gin.Context) {
-	req := &profiles.MentorRequest{}
+// func deleteMentee(c *gin.Context) {
+// 	req := &profiles.MentorRequest{}
 
-	if err := c.Bind(&req); err != nil {
-		c.JSON(501, err)
-		return
-	}
+// 	if err := c.Bind(&req); err != nil {
+// 		c.JSON(501, err)
+// 		return
+// 	}
 
-	resp, err := profileSrv.DeleteMentee(req)
-	if err != nil {
-		c.JSON(501, err)
-		return
-	}
+// 	resp, err := profileSrv.DeleteMentee(req)
+// 	if err != nil {
+// 		c.JSON(501, err)
+// 		return
+// 	}
 
-	c.JSON(200, &resp)
-}
+// 	c.JSON(200, &resp)
+// }
 
 func getMessages(c *gin.Context) {
-	uid := c.GetString("UID")
-	resp, err := profileSrv.GetMessages(uid)
+	req := &profiles.GetMessageRequest{}
+	if err := c.Bind(&req); err != nil {
+		c.JSON(501, err)
+		return
+	}
+
+	if req.From == "" {
+		req.From = c.GetString("UID")
+	} else if req.From != c.GetString("UID") {
+		c.JSON(402, "token UID does not match request UID")
+	}
+	resp, err := profileSrv.GetMessages(req)
 	if err != nil {
 		c.JSON(501, err)
 		return
@@ -229,15 +261,17 @@ func getMessages(c *gin.Context) {
 
 }
 
-func sendMessage(c *gin.Conext) {
-	uid := c.GetString("UID")
-
+func sendMessage(c *gin.Context) {
 	req := &profiles.Message{}
 	if err := c.Bind(&req); err != nil {
 		c.JSON(501, err)
 		return
 	}
-	req.From = uid
+	if req.From == "" {
+		req.From = c.GetString("UID")
+	} else if req.From != c.GetString("UID") {
+		c.JSON(402, "token UID does not match request UID")
+	}
 	resp, err := profileSrv.SendMessage(req)
 	if err != nil {
 		c.JSON(501, err)

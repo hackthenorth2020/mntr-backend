@@ -29,9 +29,7 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
 
 --update user
 ----update profile
-UPDATE profiles SET (fname, lname, email, bday, interests)
-= ($2, $3, $4, $5, $6)
-WHERE uid = $1;
+UPDATE profiles SET (fname, lname, email, bday, interests) = ($2, $3, $4, $5, $6) WHERE uid = $1;
 ----update edu
 UPDATE education SET (school, start, end, major, city, country)
 = ($2, $3, $4, $5, $6, $7)
@@ -90,7 +88,7 @@ with c as (SELECT uid, count(1) as common
       FROM pplArr)
 x WHERE lang = any(SELECT unnest(languages) FROM pplArr WHERE uid = $1) AND uid <> $1
 GROUP BY uid) 
-SELECT * FROM c ORDER BY common LIMIT $2
+SELECT * FROM c ORDER BY common
 
 --MESSAGES $1 = you, $2 = target
 SELECT * FROM messages WHERE to = $2 AND from = $1

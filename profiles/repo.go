@@ -177,7 +177,7 @@ func (repo *profileRepo) readAllProfiles() ([]*Profile, error) {
 
 	for rows.Next() {
 		profile := &Profile{}
-		err = rows.Scan(&profile.UID, &profile.FirstName, &profile.LastName)
+		err = rows.Scan(&profile.UID, &profile.FirstName, &profile.LastName, &profile.Email, &profile.Birthdate, &profile.Interests, &profile.Bio)
 		if err != nil {
 			return nil, err
 		}
@@ -187,8 +187,117 @@ func (repo *profileRepo) readAllProfiles() ([]*Profile, error) {
 	return profiles, nil
 }
 
-func (repo *profileRepo) deleteJob(profile *Profile) (bool, error) {
-	_, err := repo.conn.Exec(context.Background(),DELETE_JOBS, &profile.UID, &profile.Jobs, &profile.)
+func (repo *profileRepo) deleteJob(req *DeleteJobRequest) (bool, error) {
+	_, err := repo.conn.Exec(context.Background(), DELETE_JOBS, &req.UID, &req.Company, &req.Position)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (repo *profileRepo) deleteEdu(req *DeleteEduRequest) (bool, error) {
+	_, err := repo.conn.Exec(context.Background(), DELETE_EDUCATION, &req.UID, &req.School, &req.Major)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (repo *profileRepo) findMentor(UID string) ([]*Profile, error) {
+	rows, err := repo.conn.Query(context.Background(), GET_LIMIT_IMILAR_INTERESTS, UID, 5)
+	defer rows.Close()
+
+	profiles := make([]*Profile, 0)
+
+	for rows.Next() {
+		profile := &Profile{}
+		err = rows.Scan(&profile.UID, &profile.FirstName, &profile.LastName, &profile.Email, &profile.Birthdate, &profile.Interests, &profile.Bio)
+		if err != nil {
+			return nil, err
+		}
+		profiles = append(profiles, profile)
+	}
+
+	return profiles, nil
+}
+
+func (repo *profileRepo) requestMentor(req *MentorRequest) (bool, error) {
+	_, err := repo.conn.Exec(context.Background(), INSERT_PAIRING, &req.MentorUID, &req.MenteeUID)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (repo *profileRepo) deleteMentor(req *MentorRequest) (bool, error) {
+	_, err := repo.conn.Exec(context.Background(), DELETE_PAIRING, &req.MentorUID, &req.MenteeUID)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (repo *profileRepo) viewMentorRequests(UID string) ([]*Profile, error) {
+	rows, err := repo.conn.Query(context.Background(), SELECT_MENTOR_REQS, UID)
+	defer rows.Close()
+
+	profiles := make([]*Profile, 0)
+
+	for rows.Next() {
+		profile := &Profile{}
+		err = rows.Scan(&profile.UID, &profile.FirstName, &profile.LastName, &profile.Email, &profile.Birthdate, &profile.Interests, &profile.Bio)
+		if err != nil {
+			return nil, err
+		}
+		profiles = append(profiles, profile)
+	}
+
+	return profiles, nil
+}
+
+func (repo *profileRepo) handleMentorRequest(req *MentorResponse) (bool, error) {
+	stmt := ""
+	if req.Response == 1 { //YES
+		stmt = UPDATE_PAIR_MATCHED
+	} else {
+		stmt = UPDATE_PAIR_UNMATCHED
+	}
+	_, err := repo.conn.Exec(context.Background(), stmt, &req.MentorUID, &req.MenteeUID)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+// func (repo *profileRepo) deleteMentee(*MentorRequest) (bool, error) {
+
+// }
+
+func (repo *profileRepo) getMessages(req *GetMessageRequest) ([]*Message, error) {
+	rows, err := repo.conn.Query(context.Background(), GET_MESSAGES, req.From, req.To)
+	defer rows.Close()
+
+	msgs := make([]*Message, 0)
+
+	for rows.Next() {
+		msg := &Message{}
+		err = rows.Scan(&msg.UUID, &msg.To, &msg.From, &msg.Message, &msg.Time)
+		if err != nil {
+			return nil, err
+		}
+		msgs = append(msgs, msg)
+	}
+
+	return msgs, nil
+}
+
+func (repo *profileRepo) sendMessage(req *Message) (bool, error) {
+	_, err := repo.conn.Exec(context.Background(), INSERT_MESSAGE, &req.From, &req.To, &req.Message, &req.Time)
 	if err != nil {
 		return false, err
 	}

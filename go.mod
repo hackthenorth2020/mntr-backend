@@ -1,8 +1,8 @@
-module github.com/hackthenorth2020/go-firebase
+module github.com/hackthenorth2020/mntr-backend
 
 go 1.15
 
-replace github.com/hackthenorth2020/go-firebase/items => ./items
+replace github.com/hackthenorth2020/mntr-backend/profiles => ./profiles
 
 require (
 	cloud.google.com/go v0.75.0 // indirect
@@ -13,9 +13,9 @@ require (
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
-	github.com/hackthenorth2020/go-firebase/items v1.0.0
+	github.com/hackthenorth2020/mntr-backend/profiles v1.0.0 // indirect
 	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
-	github.com/jackc/pgx/v4 v4.10.1
+	github.com/jackc/pgx/v4 v4.10.1 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
