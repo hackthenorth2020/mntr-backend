@@ -159,14 +159,14 @@ func (repo *profileRepo) updateProfile(profile *Profile) (*Profile, error) {
 }
 
 //Delete profile
-func (repo *profileRepo) deleteProfile(uid string) (bool, error) {
-	_, err := repo.conn.Exec(context.Background(), DELETE_EDUCATION + DELETE_JOBS, &profile.UID)
-	if err != nil {
-		return false, err
-	}
+// func (repo *profileRepo) deleteProfile() (bool, error) {
+// 	_, err := repo.conn.Exec(context.Background(), Del, &profile.UID)
+// 	if err != nil {
+// 		return false, err
+// 	}
 
-	return true, nil
-}
+// 	return true, nil
+// }
 
 //Read All profiles
 func (repo *profileRepo) readAllProfiles() ([]*Profile, error) {
@@ -185,4 +185,13 @@ func (repo *profileRepo) readAllProfiles() ([]*Profile, error) {
 	}
 
 	return profiles, nil
+}
+
+func (repo *profileRepo) deleteJob(profile *Profile) (bool, error) {
+	_, err := repo.conn.Exec(context.Background(),DELETE_JOBS, &profile.UID, &profile.Jobs, &profile.)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

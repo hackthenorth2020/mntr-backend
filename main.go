@@ -67,6 +67,7 @@ func main() {
 
 			// log.Printf("Verified ID token: %v\n", token)
 			c.Set("token", token)
+			c.Set("UID", token.UID)
 		}
 	}
 
@@ -89,6 +90,20 @@ func main() {
 	r.PUT("/profiles", authMiddleware(), updateProfile)
 	r.DELETE("/profiles/:id", authMiddleware(), deleteProfile)
 	r.GET("/profiles", authMiddleware(), readAllProfiles)
+
+	r.DELETE("/job", authMiddleware(), deleteJob)
+
+	r.GET("/mentor", authMiddleware(), findMentors)
+	r.POST("/mentor", authMiddleware(), requestMentor)
+	r.DELETE("/mentor", authMiddleware(), deleteMentor)
+
+	r.GET("/mentee", authMiddleware(), viewWentorRequests)
+	r.POST("/mentee", authMiddleware(), handleMentorRequest)
+	r.DELETE("/mentee", authMiddlware(), deleteMentee)
+
+	r.GET("/messages", authMiddleware(), getMessages)
+	r.POST("/message", authMiddleware(), sendMessage)
+
 
 	r.Run(":8081") // listen and serve on 0.0.0.0:8081 (for windows "localhost:8081")
 }

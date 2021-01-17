@@ -50,6 +50,35 @@ type Pairing struct {
 	MenteeUID string `json:"menteeUID"`
 }
 
+
+type DeleteEduRequest struct {
+	UID      string
+	School  string `json:"school"`
+	Major string `json:"major"`
+}
+
+
+type DeleteJobRequest struct {
+	UID      string
+	Company  string `json:"company"`
+	Position string `json:"position"`
+}
+
+type MentorRequest struct {
+	MenteeUID string `json:"mentee_uid"`
+	Response  int    `json:"response"`
+}
+
+type MentorRequest string
+
+
+type Message struct {
+	To      string `json:"to"`
+	From    string `json:"from"`
+	Message string `json:"message"`
+	Time    string `json:"time"`
+}
+
 type ProfileService interface {
 	CreateProfile(*Profile) (*Profile, error)
 	ReadProfile(string) (*Profile, error)

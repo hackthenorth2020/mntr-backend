@@ -48,6 +48,7 @@ create table links (
 create table pairings (
     mentor_id text not null,
     mentee_id text not null,
+    status int not null,
     PRIMARY KEY (mentor_id, mentee_id),
     CONSTRAINT not_self check (mentor_id <> mentee_id),
     CONSTRAINT fk_mentor FOREIGN KEY (mentor_id) REFERENCES profiles(uid),
@@ -74,3 +75,13 @@ CREATE TABLE points (
     CONSTRAINT fk_uid FOREIGN KEY (uid) REFERENCES profiles(uid)
     ON DELETE CASCADE
 );
+
+CREATE TABLE messages (
+    uuid UUID PRIMARY KEY,
+    from text,
+    to text,
+    message text,
+    time text
+    CONSTRAINT fk_from_uid FOREIGN KEY (from) REFERENCES profiles(uid),
+    CONSTRAINT fk_from_uid FOREIGN KEY (to) REFERENCES profiles(uid)
+)

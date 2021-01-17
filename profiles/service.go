@@ -56,3 +56,12 @@ func (srv *profileService) ReadAllProfiles() ([]*Profile, error) {
 	}
 	return result, nil
 }
+
+func (srv *profileService) DeleteJob(profile *Profile) (bool error) {
+	log.Printf("[PROFILE SRV] [DELETE JOB] %v", profile)
+	result, err := srv.repo.deleteJob(profile)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
