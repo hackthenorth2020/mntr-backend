@@ -70,7 +70,7 @@ func main() {
 		}
 	}
 
-	itemSrv = items.NewItemService(sqlConnString)
+	profileSrv = profiles.NewProfileService(sqlConnString)
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
@@ -84,11 +84,11 @@ func main() {
 		})
 	})
 
-	r.POST("/items", authMiddleware(), createItem)
-	r.GET("/items/:id", authMiddleware(), readItem)
-	r.PUT("/items", authMiddleware(), updateItem)
-	r.DELETE("/items/:id", authMiddleware(), deleteItem)
-	r.GET("/items", authMiddleware(), readAllItems)
+	r.POST("/profiles", authMiddleware(), createProfile)
+	r.GET("/profiles/:id", authMiddleware(), readProfile)
+	r.PUT("/profiles", authMiddleware(), updateProfile)
+	r.DELETE("/profiles/:id", authMiddleware(), deleteProfile)
+	r.GET("/profiles", authMiddleware(), readAllProfiles)
 
 	r.Run(":8081") // listen and serve on 0.0.0.0:8081 (for windows "localhost:8081")
 }

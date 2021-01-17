@@ -1,21 +1,19 @@
 package main
 
 import (
-	"strconv"
-
 	"github.com/gin-gonic/gin"
-	"github.com/hackthenorth2020/go-firebase/items"
+	"github.com/hackthenorth2020/go-firebase/profiles"
 )
 
-func createItem(c *gin.Context) {
-	var createItemRequest *items.Item
-	err := c.Bind(&createItemRequest)
+func createProfile(c *gin.Context) {
+	var createProfileRequest *profiles.Profile
+	err := c.Bind(&createProfileRequest)
 	if err != nil {
 		c.AbortWithError(501, err)
 		return
 	}
 
-	resp, err := itemSrv.CreateItem(createItemRequest)
+	resp, err := profileSrv.CreateProfile(createProfileRequest)
 	if err != nil {
 		c.AbortWithError(501, err)
 		return
@@ -24,32 +22,15 @@ func createItem(c *gin.Context) {
 	c.JSON(200, &resp)
 }
 
-func readItem(c *gin.Context) {
+func readProfile(c *gin.Context) {
 	idStr := c.Param("id")
-	id, err := strconv.Atoi(idStr)
+	id, err := Atoi(idStr)
 	if err != nil {
 		c.AbortWithError(501, err)
 		return
 	}
 
-	resp, err := itemSrv.ReadItem(uint(id))
-	if err != nil {
-		c.AbortWithError(501, err)
-		return
-	}
-
-	c.JSON(200, &resp)
-}
-
-func updateItem(c *gin.Context) {
-	var updateItemRequest *items.Item
-	err := c.Bind(&updateItemRequest)
-	if err != nil {
-		c.AbortWithError(501, err)
-		return
-	}
-
-	resp, err := itemSrv.UpdateItem(updateItemRequest)
+	resp, err := profileSrv.ReadProfile(&id)
 	if err != nil {
 		c.AbortWithError(501, err)
 		return
@@ -58,15 +39,32 @@ func updateItem(c *gin.Context) {
 	c.JSON(200, &resp)
 }
 
-func deleteItem(c *gin.Context) {
+func updateProfile(c *gin.Context) {
+	var updateProfileRequest *profiles.Profile
+	err := c.Bind(&updateProfileRequest)
+	if err != nil {
+		c.AbortWithError(501, err)
+		return
+	}
+
+	resp, err := profileSrv.UpdateItem(updateProfileRequest)
+	if err != nil {
+		c.AbortWithError(501, err)
+		return
+	}
+
+	c.JSON(200, &resp)
+}
+
+func deleteProfile(c *gin.Context) {
 	idStr := c.Param("id")
-	id, err := strconv.Atoi(idStr)
+	id, err := Atoi(idStr)
 	if err != nil {
 		c.AbortWithError(501, err)
 		return
 	}
 
-	resp, err := itemSrv.DeleteItem(uint(id))
+	resp, err := profileSrv.DeleteProfile(&id)
 	if err != nil {
 		c.AbortWithError(501, err)
 		return
@@ -75,11 +73,9 @@ func deleteItem(c *gin.Context) {
 	c.JSON(200, &resp)
 }
 
-func readAllItems(c *gin.Context) {
+func readAllProfiles(c *gin.Context) {
 
-	resp, err := itemSrv.ReadAllItems()
-	if err != nil {
-		c.AbortWithError(501, err)
+	resp, err := profileSrv.ReadAllProfiles()
 		return
 	}
 

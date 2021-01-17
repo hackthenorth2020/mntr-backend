@@ -15,6 +15,7 @@ require (
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/hackthenorth2020/go-firebase/items v1.0.0
 	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
+	github.com/jackc/pgx/v4 v4.10.1
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
